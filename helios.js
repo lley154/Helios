@@ -8,7 +8,7 @@
 // Website:       https://www.hyperion-bt.org
 // Repository:    https://github.com/hyperion-bt/helios
 // Version:       0.16.7
-// Last update:   January 2024
+// Last update:   August 2024
 // License type:  BSD-3-Clause
 //
 //
@@ -283,7 +283,7 @@
 //                                           BIP32_HARDEN, Bip32PrivateKey, RootPrivateKey, 
 //                                           Redeemer, SpendingRedeemer, MintingRedeemer, Datum, 
 //                                           HashedDatum, InlineDatum, encodeMetadata, 
-//                                           decodeMetadata, TxMetadata
+//                                           decodeMetadata, TxMetadata, calcRefScriptsSize
 //
 //     Section 36: Highlighting function     SyntaxCategory, highlight
 //
@@ -10409,6 +10409,14 @@ export class NetworkParams {
 	 */
 	get maxCollateralInputs() {
 		return assertNumber(this.#raw?.latestParams?.maxCollateralInputs);
+	}
+
+	/**
+     * @internal
+	 * @type {number}
+	 */
+	get refScriptsFeePerByte() {
+		return assertNumber(this.#raw?.latestParams?.refScriptsFeePerByte);
 	}
 
 	/**
@@ -48793,7 +48801,13 @@ export class Tx extends CborData {
 
 		let exFee = this.#witnesses.estimateFee(networkParams);
 
-		return sizeFee + exFee;
+		const refScriptSize = calcRefScriptsSize(
+            this.body.refInputs
+        )
+        const refScriptsFee =
+            BigInt(networkParams.refScriptsFeePerByte) * BigInt(refScriptSize)
+
+		return sizeFee + exFee + refScriptsFee;
 	}
 
 	/**
@@ -53670,6 +53684,22 @@ export class TxMetadata {
 	}
 }
 
+/**
+ * @param {TxInput[]} inputs
+ * @returns {bigint} - number of cbor bytes
+ */
+export function calcRefScriptsSize(inputs) {
+    const refScriptSize = inputs
+        .reduce((prev, txInput) => {
+            if (txInput.output.refScript) {
+                return prev + BigInt(txInput.output.refScript.toCbor().length)
+            } else {
+                return prev
+            }
+        }, 0n)	
+    return refScriptSize
+}
+
 
 
 ////////////////////////////////////
@@ -55414,6 +55444,7 @@ export const rawNetworkEmulatorParams = {
         maxValueSize:5000,
         collateralPercentage:150,
         maxCollateralInputs:3,
+        refScriptsFeePerByte: 15,
         costModels:{
             PlutusV1:{
                 "sha2_256-memory-arguments":4,
@@ -55944,6 +55975,7 @@ export const rawNetworkEmulatorParams = {
 		},
 		maxBlockHeaderSize:1100,
 		maxCollateralInputs:3,
+        refScriptsFeePerByte: 15,
 		maxTxExecutionUnits:{
 			memory:14000000,
 			steps:10000000000

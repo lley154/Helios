@@ -759,7 +759,13 @@ export class Tx extends CborData {
 
 		let exFee = this.#witnesses.estimateFee(networkParams);
 
-		return sizeFee + exFee;
+		const refScriptSize = calcRefScriptsSize(
+            this.body.refInputs
+        )
+        const refScriptsFee =
+            BigInt(networkParams.refScriptsFeePerByte) * BigInt(refScriptSize)
+
+		return sizeFee + exFee + refScriptsFee;
 	}
 
 	/**
@@ -5634,4 +5640,20 @@ export class TxMetadata {
 
 		return txMetadata;
 	}
+}
+
+/**
+ * @param {TxInput[]} inputs
+ * @returns {bigint} - number of cbor bytes
+ */
+export function calcRefScriptsSize(inputs) {
+    const refScriptSize = inputs
+        .reduce((prev, txInput) => {
+            if (txInput.output.refScript) {
+                return prev + BigInt(txInput.output.refScript.toCbor().length)
+            } else {
+                return prev
+            }
+        }, 0n)	
+    return refScriptSize
 }

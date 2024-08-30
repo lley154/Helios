@@ -95,6 +95,11 @@ export function deserializeUplc(json: string | {
  */
 export function extractScriptPurposeAndName(rawSrc: string): null | [ScriptPurpose, string];
 /**
+ * @param {TxInput[]} inputs
+ * @returns {bigint} - number of cbor bytes
+ */
+export function calcRefScriptsSize(inputs: TxInput[]): bigint;
+/**
  * Returns Uint8Array with the same length as the number of chars in the script.
  * Each resulting byte respresents a different syntax category.
  * This approach should be faster than a RegExp based a approach.

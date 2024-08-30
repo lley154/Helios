@@ -847,6 +847,11 @@ declare module "helios" {
      */
     export function annotateIR(evaluation: IREvaluator, expr: IRExpr): string;
     /**
+     * @param {TxInput[]} inputs
+     * @returns {bigint} - number of cbor bytes
+     */
+    export function calcRefScriptsSize(inputs: TxInput[]): bigint;
+    /**
      * Returns Uint8Array with the same length as the number of chars in the script.
      * Each resulting byte respresents a different syntax category.
      * This approach should be faster than a RegExp based a approach.
@@ -3312,6 +3317,11 @@ declare module "helios" {
          * @type {number}
          */
         get maxCollateralInputs(): number;
+        /**
+         * @internal
+         * @type {number}
+         */
+        get refScriptsFeePerByte(): number;
         /**
          * @internal
          * @type {[number, number]} - [mem, cpu]
@@ -12370,6 +12380,7 @@ declare module "helios" {
             const maxValueSize: number;
             const collateralPercentage: number;
             const maxCollateralInputs: number;
+            const refScriptsFeePerByte: number;
             namespace costModels {
                 const PlutusV1: {
                     "sha2_256-memory-arguments": number;
@@ -12906,6 +12917,8 @@ declare module "helios" {
             export { maxBlockHeaderSize_1 as maxBlockHeaderSize };
             const maxCollateralInputs_1: number;
             export { maxCollateralInputs_1 as maxCollateralInputs };
+            const refScriptsFeePerByte_1: number;
+            export { refScriptsFeePerByte_1 as refScriptsFeePerByte };
             export namespace maxTxExecutionUnits {
                 const memory_1: number;
                 export { memory_1 as memory };

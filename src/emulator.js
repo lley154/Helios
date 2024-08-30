@@ -147,6 +147,7 @@ export const rawNetworkEmulatorParams = {
         maxValueSize:5000,
         collateralPercentage:150,
         maxCollateralInputs:3,
+        refScriptsFeePerByte: 15,
         costModels:{
             PlutusV1:{
                 "sha2_256-memory-arguments":4,
@@ -677,6 +678,7 @@ export const rawNetworkEmulatorParams = {
 		},
 		maxBlockHeaderSize:1100,
 		maxCollateralInputs:3,
+        refScriptsFeePerByte: 15,
 		maxTxExecutionUnits:{
 			memory:14000000,
 			steps:10000000000

@@ -227,6 +227,14 @@ export class NetworkParams {
 
 	/**
      * @internal
+	 * @type {number}
+	 */
+	get refScriptsFeePerByte() {
+		return assertNumber(this.#raw?.latestParams?.refScriptsFeePerByte);
+	}
+
+	/**
+     * @internal
 	 * @type {[number, number]} - [mem, cpu]
 	 */
 	get maxTxExecutionBudget() {
